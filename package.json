@@ -1,0 +1,14 @@
+{
+  "name": "kopi-senja",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Katalog dan pemesanan Kopi Senja dengan CMS sederhana.",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

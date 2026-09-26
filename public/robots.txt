@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /assets/admin.css
+Disallow: /assets/admin.js
+Disallow: /pemilik-senja-7f3a

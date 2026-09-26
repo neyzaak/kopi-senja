@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Dashboard Kopi Senja untuk mengelola menu, pesanan, dan pengaturan kedai." />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="theme-color" content="#191a17" />
+    <title>Dashboard CMS — Kopi Senja</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2032%2032'%3E%3Crect%20width%3D'32'%20height%3D'32'%20rx%3D'7'%20fill%3D'%2320221e'%2F%3E%3Cpath%20d%3D'M9%2011h12v6a5%205%200%200%201-5%205h-2a5%205%200%200%201-5-5v-6Z'%20fill%3D'%23f4efe6'%2F%3E%3Cpath%20d%3D'M21.5%2013H24a2.5%202.5%200%200%201%200%205h-2.5'%20fill%3D'none'%20stroke%3D'%23f4efe6'%20stroke-width%3D'1.8'%20stroke-linecap%3D'round'%2F%3E%3Crect%20x%3D'7'%20y%3D'24'%20width%3D'18'%20height%3D'2.6'%20rx%3D'1.3'%20fill%3D'%23d7653d'%2F%3E%3C%2Fsvg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/admin.css" />
+    <script src="/assets/vendor/lucide.min.js" defer></script>
+    <script type="module" src="/assets/admin.js"></script>
+  </head>
+  <body class="admin-body">
+    <main class="admin-login" id="adminLogin">
+      <a class="admin-brand" href="/"><span class="brand-mark"><span></span></span><span class="brand-copy"><strong>Kopi Senja</strong><small>panel pemilik</small></span></a>
+      <div class="login-card">
+        <div class="login-icon"><i data-lucide="shield-check"></i></div>
+        <span class="kicker">Area pemilik</span>
+        <h1>Selamat datang kembali.</h1>
+        <p>Masuk untuk mengubah menu, melihat pesanan, dan mengelola kedai.</p>
+        <form id="loginForm">
+          <label class="field"><span>PIN pemilik</span><div class="password-field"><input id="adminPin" name="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="Masukkan PIN" aria-label="PIN pemilik" required /><button type="button" id="togglePin" aria-label="Tampilkan PIN"><i data-lucide="eye"></i></button></div></label>
+          <p class="form-error" id="loginError" hidden><i data-lucide="circle-alert"></i> PIN belum tepat. Coba lagi.</p>
+          <button class="btn btn-dark btn-full" type="submit">Masuk ke dashboard <i data-lucide="arrow-right"></i></button>
+        </form>
+        <div class="demo-pin"><i data-lucide="key-round"></i><span>PIN demo: <strong>2580</strong></span></div>
+        <a class="back-store" href="/"><i data-lucide="arrow-left"></i> Kembali ke toko</a>
+      </div>
+    </main>
+
+    <div class="admin-app" id="adminApp" hidden>
+      <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-head">
+          <a class="admin-brand" href="/"><span class="brand-mark"><span></span></span><span class="brand-copy"><strong>Kopi Senja</strong><small>panel pemilik</small></span></a>
+          <button class="icon-button mobile-only" id="closeSidebar" type="button" aria-label="Tutup menu"><i data-lucide="x"></i></button>
+        </div>
+        <nav class="admin-nav" aria-label="Navigasi dashboard">
+          <span class="nav-label">Ruang kerja</span>
+          <button class="active" data-view="overview" type="button"><i data-lucide="layout-dashboard"></i><span>Ringkasan</span></button>
+          <button data-view="menu" type="button"><i data-lucide="coffee"></i><span>Menu</span><b id="sidebarMenuCount">0</b></button>
+          <button data-view="orders" type="button"><i data-lucide="clipboard-list"></i><span>Pesanan</span><b id="sidebarOrderCount">0</b></button>
+          <span class="nav-label">Pengaturan</span>
+          <button data-view="settings" type="button"><i data-lucide="settings-2"></i><span>Toko</span></button>
+        </nav>
+        <div class="sidebar-card"><i data-lucide="sparkles"></i><strong>Mode demo aktif</strong><p>Data tersimpan di browser ini. Siapkan database sebelum toko dibuka secara online.</p></div>
+        <div class="sidebar-user"><span class="user-avatar">PS</span><div><strong>Pemilik Senja</strong><small>Administrator</small></div><button id="logoutButton" type="button" aria-label="Keluar"><i data-lucide="log-out"></i></button></div>
+      </aside>
+      <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div><button class="icon-button mobile-only" id="openSidebar" type="button" aria-label="Buka menu"><i data-lucide="menu"></i></button><div><span class="today-label" id="todayLabel"></span><h1 id="pageTitle">Ringkasan hari ini</h1></div></div>
+          <div class="topbar-actions"><a class="store-status" href="/" target="_blank"><span class="status-dot"></span> Lihat toko <i data-lucide="external-link"></i></a><button class="icon-button notification-button" id="notificationButton" type="button" aria-label="Notifikasi" hidden><i data-lucide="bell"></i><b id="notificationCount" hidden>0</b></button><button class="admin-add-button" id="quickAddMenu" type="button" aria-label="Tambah menu"><i data-lucide="plus"></i><span>Tambah menu</span></button></div>
+        </header>
+        <div class="admin-content" id="adminContent"></div>
+      </main>
+    </div>
+
+    <dialog class="admin-dialog menu-editor-dialog" id="menuDialog">
+      <button class="dialog-close" data-close-menu-dialog type="button" aria-label="Tutup"><i data-lucide="x"></i></button>
+      <form id="menuForm">
+        <div class="admin-dialog-heading"><span class="kicker">Editor menu</span><h2 id="menuDialogTitle">Tambah menu baru</h2><p>Isi detail agar pelanggan lebih mudah memilih.</p></div>
+        <input type="hidden" name="id" />
+        <div class="form-grid"><label class="field"><span>Nama menu</span><input name="name" placeholder="Contoh: Kopi Susu Gula Aren" required /></label><label class="field"><span>Kategori</span><input name="category" list="categoryOptions" placeholder="Contoh: Kopi" required /><datalist id="categoryOptions"></datalist></label></div>
+        <label class="field"><span>Harga</span><div class="price-input"><b>Rp</b><input name="price" type="number" min="0" step="500" placeholder="28000" required /></div></label>
+        <label class="field"><span>Deskripsi</span><textarea name="description" rows="3" placeholder="Bahan utama dan rasa yang menonjol..." required></textarea></label>
+        <label class="field"><span>URL foto</span><div class="url-input"><i data-lucide="image"></i><input name="image" type="url" placeholder="https://..." required /></div></label>
+        <label class="field"><span>Label <em>opsional</em></span><input name="badge" maxlength="20" placeholder="Baru, Terlaris..." /></label>
+        <div class="switch-row"><div><strong>Tampilkan di menu</strong><small>Pelanggan dapat memesan item ini.</small></div><label class="switch"><input name="available" type="checkbox" aria-label="Tampilkan di menu" checked /><span></span></label></div>
+        <div class="switch-row"><div><strong>Menu unggulan</strong><small>Muncul di pilihan paling banyak dicari.</small></div><label class="switch"><input name="featured" type="checkbox" aria-label="Tampilkan sebagai menu unggulan" /><span></span></label></div>
+        <div class="dialog-actions"><button class="btn btn-outline" data-close-menu-dialog type="button">Batal</button><button class="btn btn-dark" type="submit"><i data-lucide="save"></i> Simpan menu</button></div>
+      </form>
+    </dialog>
+
+    <div class="admin-toast-stack" id="adminToastStack" aria-live="polite"></div>
+    <dialog class="confirm-dialog" id="confirmDialog"><div><span class="confirm-icon"><i data-lucide="trash-2"></i></span><h2 id="confirmTitle">Hapus item?</h2><p id="confirmMessage">Tindakan ini tidak dapat dibatalkan.</p><div class="dialog-actions"><button class="btn btn-outline" id="confirmCancel" type="button">Batal</button><button class="btn btn-danger" id="confirmAction" type="button">Hapus</button></div></div></dialog>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const session = sessionStorage.getItem("senja.admin.session");
+        const login = document.getElementById("adminLogin");
+        const app = document.getElementById("adminApp");
+        if (session === "active") {
+          login.hidden = true;
+          app.hidden = false;
+        } else {
+          login.hidden = false;
+          app.hidden = true;
+        }
+      });
+    </script>
+  </body>
+</html>
