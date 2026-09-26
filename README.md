@@ -1,11 +1,54 @@
 # Kopi Senja — Katalog & Pemesanan + CMS
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node: 18+](https://img.shields.io/badge/Node-18%2B-green.svg)](https://nodejs.org)
+[![No deps](https://img.shields.io/badge/dependencies-none-brightgreen.svg)](package.json)
+[![Vanilla JS](https://img.shields.io/badge/vanilla-JS%20%2B%20CSS-blue.svg)]()
+
 MVP website untuk kedai kopi dengan dua pengalaman:
 
-- **Storefront**: katalog menu, pencarian dan filter, halaman detail produk, keranjang, pilihan ambil di kedai/antar, checkout, nomor pesanan, dan handoff ke WhatsApp.
-- **Dashboard CMS**: pemilik dapat menambah, mengubah, menghapus menu, mengubah status ketersediaan, melihat pesanan, memperbarui status pesanan, mengekspor CSV, dan mengubah informasi toko tanpa menyentuh kode. Lonceng notifikasi di topbar hanya muncul saat ada pesanan aktif (baru, sedang dibuat, siap diambil) dan angkanya adalah jumlah pesanan aktif tersebut.
+- **Storefront**: katalog menu, pencarian & filter, halaman detail produk, keranjang, pilihan ambil di kedai/antar, checkout, nomor pesanan, dan handoff ke WhatsApp.
+- **Dashboard CMS**: CRUD menu, ketersediaan, pesanan, status, ekspor CSV, pengaturan toko, reset data demo — tanpa menyentuh kode.
 
-## Menjalankan
+---
+
+## ✨ Fitur Utama
+
+### Storefront (Pelanggan)
+- Katalog menu dengan pencarian real-time & filter kategori
+- Halaman detail produk (gambar, harga, deskripsi, ketersediaan)
+- Keranjang belanja (tambah/kurang/hapus, hitung otomatis)
+- Pilih **Ambil di Kedai** atau **Antar** (biaya antar otomatis)
+- Checkout: nama, telepon, alamat (untuk antar), catatan, pembayaran (QRIS/Tunai)
+- Nomor pesanan unik (`SEN-YYMMDD-XXX`)
+- Handoff ke WhatsApp dengan pesan terstruktur siap kirim
+- Mode gelap/terang (preferensi tersimpan di `localStorage`, tanpa flash)
+- Scrollbar kustom tema (15px, tidak menggeser layout)
+- Responsif: mobile-first, breakpoint 560px (badge keranjang 15px→30px, font 8px→11px)
+
+### Dashboard CMS (Pemilik)
+- **Akses via link rahasia** (`/pemilik-senja-7f3a`), bukan `/admin`
+- Route lama (`/admin`, `/admin/`, `/admin.html`) → 404 + `X-Robots-Tag: noindex` + `Cache-Control: no-store`
+- CRUD Menu: tambah, edit, hapus, upload gambar (drag-drop / paste)
+- Ketersediaan: toggle tersedia/habis per item
+- Kelola Pesanan: filter status, ubah status (baru → dibuat → siap → selesai/batal)
+- Notifikasi topbar (lompat ke halaman Pesanan, jumlah = pesanan aktif)
+- Ekspor CSV pesanan (filter status/rentang tanggal)
+- Pengaturan toko: nama, alamat, telepon, jam buka, fee antar, WhatsApp, banner
+- Reset data demo (menu + pesanan + pengaturan) tanpa hapus preferensi tema
+- PIN demo: `2580`
+
+### Teknis
+- **Zero npm deps** — Node 18+ cukup, `npm run dev` jalan langsung
+- Data di `localStorage` (demo lintas sesi, tanpa database)
+- Font: DM Sans (Google Fonts, `display=swap`)
+- Ikon: Lucide (bundled, `vendor/lucide.min.js`)
+- CSS Custom Properties untuk theming & scrollbar
+- Badge angka di-center optis (ink centroid, bukan advance box) — tabel per ukuran font (8/9/10/11px)
+
+---
+
+## 🚀 Menjalankan
 
 ```bash
 cd kopi-senja
@@ -13,77 +56,126 @@ npm run dev
 ```
 
 Buka:
+- **Storefront**: `http://localhost:4173`
+- **Dashboard**: `http://localhost:4173/pemilik-senja-7f3a` (PIN: `2580`)
 
-- Storefront: `http://localhost:4173`
-- Link khusus pemilik: `http://localhost:4173/pemilik-senja-7f3a`
-- PIN demo: `2580`
-
-Dashboard tidak lagi ditampilkan atau ditautkan di web pelanggan. Pemilik hanya membuka link khusus di atas. Route lama `/admin` dan `/admin.html` sudah dinonaktifkan (menghasilkan 404), dan halaman dashboard mengirim header `X-Robots-Tag: noindex` serta `no-store`.
-
-Ganti link khusus bila perlu:
-
+Ganti link khusus pemilik:
 ```bash
 ADMIN_ROUTE=ruang-pemilik-anda npm run dev
 ```
 
-Tidak ada dependensi npm yang perlu dipasang. Node.js 18+ sudah cukup.
+---
 
-## Data demo
-
-Versi ini memakai `localStorage` agar seluruh alur dapat dicoba tanpa akun database atau konfigurasi hosting. Data menu, pesanan, pengaturan, dan keranjang tersimpan pada browser/origin yang sama.
-
-> Untuk penggunaan nyata lintas perangkat, dashboard perlu backend/database, autentikasi pemilik yang sesungguhnya, upload gambar ke object storage, nomor WhatsApp bisnis, dan aturan deployment. PIN pada versi demo hanya untuk demonstrasi lokal.
-
-## Mode gelap
-
-Bagian akhir halaman storefront punya section khusus "Preferensi tampilan" (`#tema`) berisi tombol mode gelap.
-
-- Tanpa pilihan tersimpan, tampilan mengikuti setelan sistem (`prefers-color-scheme`).
-- Setelah diklik, pilihan `light`/`dark` disimpan di `localStorage` (`senja.theme.v1`) dan tidak lagi dikoreksi setelan sistem.
-- Script kecil di `<head>` menerapkan tema sebelum body dirender, jadi tidak ada kedip dari terang ke gelap.
-- `color-scheme` ikut berubah, sehingga dropdown `<select>` dan kontrol bawaan browser ikut gelap.
-- Warna address bar (<meta name="theme-color">) menyesuaikan tema.
-- Scrollbar halaman memakai gaya sendiri (lihat di bawah), jadi warnanya datang dari token `--sb-thumb`, bukan dari `color-scheme`.
-- Reset data demo di dashboard tidak menghapus pilihan tampilan.
-
-Semua warna berasal dari token CSS di `assets/styles.css`; blok `[data-theme="dark"]` hanya menimpa nilai token, tanpa mengubah struktur DOM.
-
-## Scrollbar halaman
-
-Gulir vertikal storefront diberi gaya sendiri agar sesuai tema, dan hanya di halaman pelanggan.
-
-- Discope ke `html.store-root` (kelas yang ada di `index.html` saja), sehingga dashboard CMS tetap memakai scrollbar bawaan.
-- Track transparan, thumb berupa pil warna kopi dari `--sb-thumb`, melayang di atas konten. Di hover warnanya menghangat ke `--accent-dark` dan thumb membesar 7px → 9px.
-- Lebar `15px` dipilih **sama persis** dengan gutter scrollbar bawaan Chrome di Windows, sehingga mengaktifkan gaya ini tidak menggeser layout satu piksel pun. Kalau diubah, seluruh situs akan bergeser.
-- Firefox tidak mengenal `::-webkit-scrollbar`, jadi dapat versi minimal lewat `scrollbar-color` di dalam `@supports (-moz-appearance: none)`.
-- Border transparan + `background-clip: content-box` yang membuat thumb tetap slim di tengah track.
-
-Dua hal yang mudah dinetralkan tanpa sengaja:
-
-- Jangan memakai `scrollbar-width` atau `scrollbar-color` di elemen yang sama. Chrome menganggap `::-webkit-scrollbar` diabaikan begitu salah satunya dipecah, sehingga track/thumb kustom ini lenyap. Dua properti itu hanya boleh ditulis di blok `@supports` khusus Firefox.
-- Angka `15px` di `width` bukan pilihan estetika. Menggantinya dengan angka lain akan menggeser isi halaman.
-
-## Struktur
+## 📁 Struktur Proyek
 
 ```text
 kopi-senja/
-├── server.mjs              # server statis tanpa dependensi
-└── public/
-    ├── index.html          # storefront
-    ├── admin.html          # dashboard CMS
-    └── assets/
-        ├── styles.css      # desain storefront
-        ├── admin.css       # desain dashboard
-        ├── store.js        # model data + localStorage
-        ├── app.js          # interaksi storefront
-        └── admin.js        # interaksi CMS
+├── server.mjs              # Static file server (no deps)
+├── package.json            # Scripts only: "dev": "node server.mjs"
+├── public/
+│   ├── index.html          # Storefront entry
+│   ├── admin.html          # Dashboard CMS entry
+│   ├── robots.txt          # Disallow /pemilik-*
+│   └── assets/
+│       ├── styles.css      # Storefront design system
+│       ├── admin.css       # Dashboard design
+│       ├── store.js        # Data model + localStorage API
+│       ├── app.js          # Storefront interactions
+│       ├── admin.js        # Dashboard interactions
+│       ├── optical-center.js  # Badge centering tables + fn
+│       └── vendor/
+│           └── lucide.min.js
 ```
 
-## Alur uji cepat
+---
 
-1. Buka storefront, pilih kategori, lalu klik produk atau tombol `+`.
-2. Buka keranjang, pilih ambil/antar, isi data, dan kirim pesanan.
-3. Buka link khusus pemilik (`/pemilik-senja-7f3a`) lalu masuk dengan PIN `2580`. Pastikan `/admin` dan `/admin.html` sudah 404.
-4. Ubah status menu atau pesanan dan buka storefront di tab lain; perubahan langsung terlihat.
-5. Scroll ke section "Preferensi tampilan" di akhir halaman, klik tombol mode gelap, lalu reload — pilihan harus tetap.
-6. Coba dashboard dalam mode privat — data browser akan terpisah sesuai aturan penyimpanan browser.
+## 🎨 Desain & Tema
+
+| Token | Light | Dark |
+|-------|-------|------|
+| `--bg` | `#f5f4ef` | `#1a1a2e` |
+| `--fg` | `#1a1a2e` | `#f5f4ef` |
+| `--accent` | `#c47a3a` | `#d4a85a` |
+| `--card` | `#fff` | `#23233a` |
+| `--muted` | `#8b7d6b` | `#a89d8f` |
+| `--border` | `#e8e4dc` | `#3a3a52` |
+
+Semua warna di `assets/styles.css` → blok `:root` & `[data-theme="dark"]`.
+
+**Scrollbar** (hanya storefront, `html.store-root`):
+- `width: 15px` → sama persis gutter Chrome Windows
+- Thumb: `--sb-thumb` (warna kopi), hover → `--accent-dark`, expand 7→9px
+- Firefox fallback via `scrollbar-color` di `@supports (-moz-appearance: none)`
+
+---
+
+## ♿ Aksesibilitas
+
+- Semantic HTML5 (`<main>`, `<section>`, `<article>`, `<nav>`, `<dialog>`)
+- Label & `aria-*` pada form & kontrol
+- Focus ring visible (`:focus-visible`)
+- Kontras ≥ 4.5:1 (status pill, tombol, teks)
+- `prefers-reduced-motion` dihormati (animasi dinonaktifkan)
+- `prefers-color-scheme` sebagai default sebelum preferensi user
+
+---
+
+## 🔐 Keamanan (Demo)
+
+- Dashboard hanya lewat link rahasia (`ADMIN_ROUTE`, default 32-char entropy)
+- PIN demo `2580` — **hanya untuk lokal**, ganti sebelum produksi
+- `X-Robots-Tag: noindex` + `Cache-Control: no-store` di dashboard
+- Input sanitasi via `escapeHtml()` di `store.js`
+- Tidak ada eval / innerHTML raw dari input user
+
+> Untuk produksi: ganti `localStorage` → database, tambah autentikasi JWT/session, HTTPS wajib, CSP header, rate-limit, validasi server-side.
+
+---
+
+## 🧪 Alur Uji Cepat
+
+1. Buka storefront → pilih kategori → klik produk / tombol `+`
+2. Buka keranjang (badge angka di kanan atas) → pilih ambil/antar → isi data → kirim
+3. Buka link pemilik → PIN `2580` → cek `/admin` & `/admin.html` = 404
+4. Ubah status menu/pesanan → buka storefront tab lain → update real-time
+5. Scroll ke "Preferensi tampilan" → klik mode gelap → reload → tetap gelap
+6. Buka dashboard di incognito → data terpisah (localStorage per origin)
+
+---
+
+## 📦 Deployment (Ringkas)
+
+```bash
+# Build static (sudah static, cuma copy public/)
+# Atau deploy server.mjs ke Node host (Railway, Render, Fly.io, VPS)
+# Env: ADMIN_ROUTE=rahasia-anda  PORT=4173
+```
+
+**Checklist produksi:**
+- [ ] Ganti `ADMIN_ROUTE` ke string acak panjang
+- [ ] Ganti PIN default (`store.js` → `ADMIN_PIN`)
+- [ ] Pasang database (PostgreSQL/SQLite) + migrasi `store.js` ke Prisma/Drizzle
+- [ ] Tambah auth pemilik (session/JWT, bukan PIN statis)
+- [ ] Upload gambar → S3/R2/Cloudinary (bukan base64 di localStorage)
+- [ ] WhatsApp Business API (bukan `wa.me` link)
+- [ ] HTTPS + HSTS + CSP + rate-limit
+- [ ] Backup & monitoring
+
+---
+
+## 🤝 Kontribusi
+
+1. Fork → branch `feat/nama-fitur`
+2. Commit konvensional (`feat:`, `fix:`, `refactor:`, `docs:`)
+3. Pastikan `npm run dev` jalan & no console error
+4. PR ke `main` dengan deskripsi singkat & screenshot (UI change)
+
+---
+
+## 📄 Lisensi
+
+MIT — bebas dipakai, dimodifikasi, didistribusikan. Lihat [LICENSE](LICENSE).
+
+---
+
+> **Kopi Senja** — dibangun untuk demo MVP kedai kopi modern, vanilla, zero-deps. ☕
